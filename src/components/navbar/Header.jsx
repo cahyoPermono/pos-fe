@@ -2,7 +2,6 @@ import {
   AppBar,
   Avatar,
   Button,
-  CssBaseline,
   Divider,
   Drawer,
   IconButton,
@@ -20,9 +19,10 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
 import SpeedIcon from "@material-ui/icons/Speed";
+import CreditCardIcon from "@material-ui/icons/CreditCard";
+import PostAddIcon from "@material-ui/icons/PostAdd";
+import { Link } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -69,9 +69,9 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: "hidden",
-    width: theme.spacing(6) + 1,
+    width: theme.spacing(7) + 1,
     [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(8) + 1,
+      width: theme.spacing(9) + 1,
     },
   },
   toolbar: {
@@ -101,6 +101,30 @@ const Header = (props) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
+  const navbarItems = [
+    {
+      id: 1,
+      icon: <SpeedIcon />,
+      name: "Dashboard",
+      show: props.isMod,
+      path: '/'
+    },
+    {
+      id: 2,
+      icon: <CreditCardIcon />,
+      name: "Transaction",
+      show: true,
+      path: '/transaction'
+    },
+    {
+      id: 3,
+      icon: <PostAddIcon />,
+      name: "Product",
+      show: props.isAdmin,
+      path: '/product'
+    },
+  ];
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -110,15 +134,14 @@ const Header = (props) => {
   };
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
+    <div>
       <AppBar
+        style={{ backgroundColor: "white" }}
         color="inherit"
         position="fixed"
         className={clsx(classes.appBar, {
           [classes.appBarShift]: open,
         })}
-        elevation="5"
       >
         <Toolbar>
           <IconButton
@@ -133,20 +156,20 @@ const Header = (props) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap className={classes.logo}>
-            {props.shopName}
+            TOKO SENTOSA
           </Typography>
           <Divider
             orientation="vertical"
             flexItem
             style={{ marginLeft: "auto" }}
           />
-          {props.isSignIn ? (
+          {props.currentUser ? (
             <Button className={classes.buttonToolbar}>
               <Avatar className={classes.user} style={{ marginRight: "5px" }}>
-                {props.user.name[0]}
+                {props.currentUser.username.toUpperCase()[0]}
               </Avatar>
               <Typography variant="button" className={classes.user}>
-                {props.user.name}
+                {props.currentUser.username.toUpperCase()}
               </Typography>
               <ExpandMoreIcon />
             </Button>
@@ -162,7 +185,7 @@ const Header = (props) => {
           [classes.drawerClose]: !open,
         })}
         classes={{
-          paper: clsx(classes.paper, {
+          paper: clsx({
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
           }),
@@ -179,28 +202,19 @@ const Header = (props) => {
         </div>
         <Divider />
         <List>
-          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <SpeedIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+          {navbarItems.map((item) => {
+            return item.show === true ? (
+              <Link key={item.id} to={item.path} style={{color:'inherit', textDecoration:'none'}}>
+                <ListItem button>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.name} />
+                </ListItem>
+              </Link>
+            ) : null;
+          })}
         </List>
         <Divider />
-        <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
       </Drawer>
-      <div className={classes.toolbar} />
     </div>
   );
 };
