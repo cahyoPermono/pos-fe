@@ -8,6 +8,7 @@ import {
   VictoryBar,
   VictoryTooltip,
   VictoryPie,
+  VictoryLabel,
 } from "victory";
 import Notif from "../components/Notif";
 import AuthService from "../services/AuthService";
@@ -16,14 +17,13 @@ import moment from "moment";
 import TransactionService from "../services/TransactionService";
 
 export default function Dashboard() {
-  const [mReport, setMReport] = useState();
-  const [pReport, setPReport] = useState();
+  const [mReport, setMReport] = useState([]);
+  const [pReport, setPReport] = useState([]);
   const [message, setMessage] = useState({ status: "", message: "" });
   const [openNotif, setOpenNotif] = useState(false);
 
   useEffect(() => {
     const now = new Date();
-    console.log(now);
     ReportService.getTransactionReportByMonthAndYear(
       now.getMonth() + 1,
       now.getFullYear()
@@ -33,7 +33,6 @@ export default function Dashboard() {
         setMReport(getResultTotal(response.data));
       },
       (error) => {
-        console.log(error);
         if (error.response.status && error.response.status === 401) {
           AuthService.logout();
         }
@@ -55,13 +54,41 @@ export default function Dashboard() {
     );
   }, []);
 
-  function getTotalBuyByProduct(data) {}
+  function getTotalBuyByProduct(data) {
+    //get all transaction details from list transactions
+    const dataProduct = data.reduce((acc, item) => {
+      console.log(acc);
+      console.log(item.transactionDetails);
+      acc = acc.concat(item.transactionDetails);
+      return acc;
+    }, []);
+
+    console.log(dataProduct);
+    //extract data we need for pie chart
+    const dataPie = dataProduct.reduce((acc, item) => {
+      acc[item.productName] = (acc[item.productName] || 0) + item.quantity;
+      return acc;
+    }, {});
+
+    console.log(dataPie);
+
+    //mapping agar sesuai dengan pie chart
+    const hasil = Object.keys(dataPie).map((item) => {
+      return {
+        x: item,
+        y: dataPie[item],
+      };
+    });
+
+    console.log(hasil);
+
+    return hasil;
+  }
 
   function getResultTotal(data) {
     const reduce = data.reduce((acc, item) => {
       const time = new Date(item.date);
       const strTime = moment(time).format("DD/MMM/YYYY");
-      console.log(strTime);
       acc[strTime] = (acc[strTime] || 0) + item.total;
       return acc;
     }, {});
@@ -109,7 +136,20 @@ export default function Dashboard() {
           </VictoryChart>
         </Grid>
         <Grid item xs={6}>
-          <VictoryPie />
+        
+          <VictoryPie
+            padding={100}
+            theme={VictoryTheme.material}
+            data={pReport}
+            colorScale={["tomato", "orange", "gold", "cyan", "navy"]}
+            labels={true}
+            labelComponent={
+              <VictoryLabel
+                text={({ datum }) => [`${datum.x}`, `${datum.y}`]}
+                style={{ fontSize: "12" }}
+              />
+            }
+          />
         </Grid>
       </Grid>
       <Notif

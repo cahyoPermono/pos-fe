@@ -8,6 +8,8 @@ import {
   Toolbar,
   Typography,
   List,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import React from "react";
@@ -100,6 +102,20 @@ const Header = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleLogOut = () => {
+    setAnchorEl(null);
+    props.handleLogOut();
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const navbarItems = [
     {
@@ -107,21 +123,21 @@ const Header = (props) => {
       icon: <SpeedIcon />,
       name: "Dashboard",
       show: props.isMod,
-      path: '/'
+      path: "/",
     },
     {
       id: 2,
       icon: <CreditCardIcon />,
       name: "Transaction",
       show: true,
-      path: '/transaction'
+      path: "/transaction",
     },
     {
       id: 3,
       icon: <PostAddIcon />,
       name: "Product",
       show: props.isAdmin,
-      path: '/product'
+      path: "/product",
     },
   ];
 
@@ -164,7 +180,7 @@ const Header = (props) => {
             style={{ marginLeft: "auto" }}
           />
           {props.currentUser ? (
-            <Button className={classes.buttonToolbar}>
+            <Button className={classes.buttonToolbar} onClick={handleClick}>
               <Avatar className={classes.user} style={{ marginRight: "5px" }}>
                 {props.currentUser.username.toUpperCase()[0]}
               </Avatar>
@@ -204,7 +220,11 @@ const Header = (props) => {
         <List>
           {navbarItems.map((item) => {
             return item.show === true ? (
-              <Link key={item.id} to={item.path} style={{color:'inherit', textDecoration:'none'}}>
+              <Link
+                key={item.id}
+                to={item.path}
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
                 <ListItem button>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.name} />
@@ -215,6 +235,17 @@ const Header = (props) => {
         </List>
         <Divider />
       </Drawer>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem name="logout" onClick={handleLogOut}>
+          Logout
+        </MenuItem>
+      </Menu>
     </div>
   );
 };

@@ -45,6 +45,11 @@ export default function App() {
     }
   }, []);
 
+  function handleLogOut(){
+    AuthService.logout();
+    setCurrentUser(AuthService.getCurrentUser);
+  }
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -53,6 +58,7 @@ export default function App() {
           currentUser={currentUser}
           isMod={showModeratorBoard}
           isAdmin={showAdminBoard}
+          handleLogOut={handleLogOut}
         />
       ) : null}
       <main className={classes.content}>

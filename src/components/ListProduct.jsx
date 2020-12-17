@@ -12,6 +12,7 @@ import {
 import React, { useEffect, useState } from "react";
 import AuthService from "../services/AuthService";
 import ProductService from "../services/ProductService";
+import { useHistory } from 'react-router-dom';
 
 const columns = [
   {
@@ -60,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ListProduct = (props) => {
+  const history = useHistory();
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -94,6 +96,7 @@ const ListProduct = (props) => {
         console.log(error)
         if (error.response.status && error.response.status === 401) {
           AuthService.logout();
+          history.push('/login');
         }
 
         const _content =
@@ -110,7 +113,7 @@ const ListProduct = (props) => {
         setProducts([]);
       }
     );
-  }, [props]);
+  }, [props,history]);
 
   return (
     <div>

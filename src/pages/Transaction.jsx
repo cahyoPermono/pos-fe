@@ -60,9 +60,10 @@ function priceRow(qty, unit) {
   return qty * unit;
 }
 
-function createRow(desc, quantity, unitPrice, discount, productId) {
+function createRow(desc, quantity, unitPrice, discount, productId, basePrice) {
   const price = priceRow(quantity, unitPrice);
-  return { desc, quantity, unitPrice, price, discount, productId };
+  const productName = desc;
+  return { desc, quantity, unitPrice, price, discount, productId, productName, basePrice };
 }
 
 function subtotal(items) {
@@ -88,7 +89,7 @@ function Transaction(props) {
   };
 
   const handleAdd = (item) => {
-    const itemToAdd = createRow(item.name, 1, item.retailPrice, 0, item.id);
+    const itemToAdd = createRow(item.name, 1, item.retailPrice, 0, item.id, item.basePrice);
     const indexItem = details.findIndex((item) => {
       return item.productId === itemToAdd.productId;
     });
@@ -179,7 +180,6 @@ function Transaction(props) {
 
   const handleDialogBayar = () => {
     setOpenDialogBayar(true);
-    
 
     // set transactions
     const thisTime = new Date();
@@ -187,7 +187,7 @@ function Transaction(props) {
     setTransaction({
       customerId: null,
       total: invoiceTotal,
-      date: moment(new Date()).format('YYYY-MM-DD HH:mm'),
+      date: moment(new Date()).format("YYYY-MM-DD HH:mm"),
       transDetails: details,
     });
   };
